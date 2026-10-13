@@ -1,3 +1,9 @@
+CREATE DATABASE IF NOT EXISTS airlines
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE airlines;
+
 CREATE TABLE clients (
     id VARCHAR(12) PRIMARY KEY,
     name VARCHAR(255),
@@ -25,7 +31,7 @@ CREATE TABLE trips (
 CREATE TABLE airliners (
     id INT PRIMARY KEY,
     model_name VARCHAR(255),
-    range INT,
+    `range` INT,
     production_year INT,
     color VARCHAR(255),
     side_number INT,
@@ -43,3 +49,39 @@ ALTER TABLE tickets
 ALTER TABLE trips
     ADD CONSTRAINT fk_trips_airliner
     FOREIGN KEY (airliner_id) REFERENCES airliners(id);
+
+
+LOAD DATA LOCAL INFILE '/Users/gordstep/Documents/database/airplaines/csv/clients.csv'
+INTO TABLE clients
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+SHOW WARNINGS LIMIT 20;
+
+LOAD DATA LOCAL INFILE '/Users/gordstep/Documents/database/airplaines/csv/airliners.csv'
+INTO TABLE airliners
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+LOAD DATA LOCAL INFILE '/Users/gordstep/Documents/database/airplaines/csv/trips.csv'
+INTO TABLE trips
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+LOAD DATA LOCAL INFILE '/Users/gordstep/Documents/database/airplaines/csv/tickets.csv'
+INTO TABLE tickets
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(id, trip_id, service_class, @price, @client_id)
+SET
+    price = NULLIF(TRIM(@price), 'null'),
+    client_id = TRIM(TRAILING '\r' FROM @client_id);
+
+SHOW WARNINGS LIMIT 20;
