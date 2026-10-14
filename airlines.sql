@@ -85,3 +85,50 @@ SET
     client_id = TRIM(TRAILING '\r' FROM @client_id);
 
 SHOW WARNINGS LIMIT 20;
+
+-- Задание 1
+select model_name from airliners where `range`='4200';
+
+-- Задание 2
+select id from tickets where price between 0 and 13200;
+
+-- Задание 3
+select side_number from airliners where color='white';
+
+-- Задание 4 
+-- ! необходимо переименовать range в max_distance
+select `range` from airliners where model_name='Cessna 172';
+
+-- Задание 5
+select id from trips where arrival='PEZ' or arrival='MMK' or arrival='VKO';
+
+-- Задание 6
+select id from trips where departure='DME' and status='Cancelled';
+
+-- Задание 7 
+select model_name from airliners where `range` between 4200 and 7900;
+
+-- Задание 8
+-- Не учитывает регистр
+select id from clients where name like 'Daria%';
+
+-- Задание 9
+select id from tickets where not service_class='Business';
+
+-- Задание 10
+update clinets set phone='+77140700202' where name like 'Denis S%';
+select * from clients where name like 'Denis S%';
+
+-- Задание 11
+select id from clients where name like '%Volkov%' and age between 21 and 35;
+
+-- Задание 12 
+select id, price from tickets where service_class='Business' and not price between 9100 and 70400;
+
+-- Задание 13 
+select name from clients where (id like '%RCB' or id like '%FCV') and not phone like '+705%' and not phone like '705%';
+
+-- Задание 14
+select side_number from airliners where country!='Russia\r' or (country='Russia\r' and production_year!='2005' and production_year!='2008' and `range` > 5000);
+
+-- Задание 15
