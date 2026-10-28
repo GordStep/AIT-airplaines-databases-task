@@ -31,7 +31,7 @@ update clients set phone='+77140700202' where name like 'Denis S%';
 select id, name from clients where name like 'Denis S%' and phone like '+7___0700202';
 
 -- Задание 11
-select id from clients where (name like '%Volkov' or name like '%Vlkova') and age between 21 and 25;
+select id from clients where (name like '%Volkov' or name like '%Volkova') and age between 21 and 25;
 
 -- Задание 12 
 select id, price from tickets where service_class='Business' and not price between 9100 and 70400;
@@ -45,8 +45,8 @@ select name from clients where (
 
 -- Задание 14
 select side_number from airliners where 
-    country!='Russia\r' or (
-        country='Russia\r' and 
+    country!='Russia' or (
+        country='Russia' and 
         production_year!='2005' and 
         production_year!='2008' and 
         `range` > 5000);
@@ -183,3 +183,34 @@ select id, name, concat( upper( left(name, 1) ), substring(name, 2) ) as newname
 select id, phone, replace(phone, ' ', '')  as newphone from clients;
 
 -- Задание 41
+select phone, concat(left(phone, 2), repeat('*', char_length(phone) - 4), right(phone, 2)) from clients;
+
+-- Задание 42
+select side_number, case 
+    when production_year < 2000 then 'Old'
+    when production_year between 2000 and 2010 then 'Mid'
+    else 'New'
+    end as age
+from airliners where `range` <= 10000
+order by 
+    age asc;
+
+-- Задание 43
+select id, trip_id, case 
+    when service_class='Economy' then (1 - 0.15) * price
+    when service_class='Business' then (1 - 0.1) * price
+    when service_class='PremiumEconomy' then (1 - 0.2) * price
+    else price
+    end as new_price
+from tickets where trip_id='LL4S1G8PQW' or trip_id='0SE4S0HRRU' or trip_id='JQF04Q8I9G';
+
+-- Задание 44
+select id as flight from trips where status='Arrived' and id like 'Y%' order by trip_code asc;
+
+-- Задание 45
+select lower(departure) as departure, lower(status) as status, airliner_id from trips where arrival='DME';
+
+-- Задание 46
+select distinct * from clients where char_length(name)=13 and age>21 order by age;
+
+-- Задание 47

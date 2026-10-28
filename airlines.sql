@@ -59,6 +59,10 @@ LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 SHOW WARNINGS LIMIT 20;
 
+update clients set phone = NULL where phone = 'null';
+select phone, replace(phone, ' ', '')  from clients;
+update clients set phone = concat('+', phone) where left(phone, 1) != '+';
+
 LOAD DATA LOCAL INFILE '/Users/gordstep/Documents/database/airplaines/csv/airliners.csv'
 INTO TABLE airliners
 FIELDS TERMINATED BY ';'
@@ -89,3 +93,5 @@ SET country = TRIM(TRAILING '\r' FROM country)
 WHERE RIGHT(country, 1) = '\r';
 
 SHOW WARNINGS LIMIT 20;
+
+
