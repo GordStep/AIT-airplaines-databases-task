@@ -211,6 +211,184 @@ select id as flight from trips where status='Arrived' and id like 'Y%' order by 
 select lower(departure) as departure, lower(status) as status, airliner_id from trips where arrival='DME';
 
 -- Задание 46
-select distinct * from clients where char_length(name)=13 and age>21 order by age;
+select name 
+from clients
+where char_length(name)=13 and age>21 group by name order by min(age);
 
 -- Задание 47
+select name, case 
+    when phone is NULL then 'UNDEFINED'
+    else phone
+    end as phone
+from clients where name like 'Anna%';
+
+-- Задание 48
+select DISTINCT arrival from trips where airliner_id='305881' order by arrival;
+
+-- Задание 49
+select id, trip_code
+from trips
+where airliner_id in ('305881', '473503', '603813')
+order by arrival asc, trip_code desc;
+
+-- Задание 50
+select lower(id) as id, case 
+    when price is NULL then 'UNDEFINED'
+    else 'DEFINED'
+    end as price_status
+from tickets;
+
+-- Задание 51
+select name from clients join tickets as t on t.client_id=clients.id join trips as tr on tr.id=t.trip_id where tr.airliner_id=305881;
+
+-- Задание 52
+select name, tr.departure as departure from clients join tickets as t on t.client_id=clients.id join trips as tr on tr.id=t.trip_id where tr.status='Delayed';
+
+-- Задание 53
+delimiter $$
+create FUNCTION get_count_airliner_trips (search_airliner_id varchar(12))
+RETURNS INT 
+not deterministic 
+READS SQL DATA
+BEGIN
+    DECLARE trip_count INT DEFAULT 0;
+    select count(*) into trip_count from trips where trips.airliner_id=search_airliner_id;
+    return trip_count;
+END $$
+delimiter ;
+
+select model_name as trips_count from airliners where get_count_airliner_trips(id)=0;
+
+-- Задание 54
+select name, t.price from clients join tickets as t on t.client_id=clients.id where service_class='PremiumEconomy' and t.price <= (select avg(price) from tickets);
+
+-- Задание 55
+select clients.id, clients.name from clients 
+join tickets as tick on tick.client_id=clients.id 
+join trips as tri on tri.id=tick.trip_id
+join airliners as air on tri.airliner_id=air.id
+where air.country='Russia' and tri.status='Arrived';
+
+-- Задание 56
+select clients.id, clients.name
+from clients
+join tickets as tick on tick.client_id=clients.id 
+join trips as tri on tri.id=tick.trip_id
+join airliners as air on tri.airliner_id=air.id
+where 2026-air.production_year > clients.age and tri.status='Arrived';
+
+-- Задание 57
+select MAX(tick.price) as max_price
+from trips
+join tickets as tick on tick.trip_id=trips.id
+where trips.arrival='DME';
+
+-- Задание 58
+select COUNT(*) as count 
+from trips
+join airliners as a on trips.airliner_id=a.id
+where a.color='white';
+
+-- Задание 59
+select clients.id, clients.name
+from clients
+join tickets as tick on tick.client_id=clients.id
+where tick.service_class='FirstClass';
+
+-- Задание 60
+select max(tickets.price) as max_price
+from tickets
+join trips as tr on tickets.trip_id=tr.id
+join airliners as a on a.id=tr.airliner_id
+where a.`range` = (select MAX(`range`) from airliners);
+
+-- Задание 61
+select count(*) as hope_count
+from clients
+join tickets as tick on tick.client_id=clients.id
+join trips as tr on tick.trip_id=tr.id
+where tr.status='Departed' and clients.name like 'Nadezhda%';
+
+-- Задание 62
+select SUM(price)-SUM(case 
+    when service_class='Economy' then (1 - 0.15) * price
+    when service_class='FirstClass' then (1 - 0.1) * price
+    when service_class='PremiumEconomy' then (1 - 0.2) * price
+    else price
+    end) as expenses
+from tickets where trip_id in ('DAA22Y84O7', '41BVLBDKOH', 'VCKEGVKWW8');
+
+-- Задание 63
+select AVG(`range`) as avg_range 
+from airliners 
+where production_year >= 2008 and model_name like 'Airbus%';
+
+-- Задание 64
+select model_name
+from airliners
+group by model_name
+having MAX(`range`) - MIN(`range`) > 1000
+order by MAX(`range`) - MIN(`range`) desc;
+
+-- Задание 65
+select service_class, AVG(price) as avg_price 
+from tickets 
+join trips as tr on tr.id=tickets.trip_id
+where 
+    tr.trip_code is not null 
+    and tr.trip_code not in ('FYNDDJVU', 'FYMKPDZC')
+    and service_class is not null
+group by service_class
+order by avg_price asc;
+
+-- Задание 66
+select  case
+    when `range` between 1001 and 2500 then 'short-haul'
+    when `range` between 2501 and 6000 then 'medium-haul'
+    when `range` > 6000 then 'long-haul'
+    else 'UNDEFINED'
+    end as category,
+    avg(production_year) as avg_year, count(*) as cnt
+from airliners 
+where `range` > 1000 and `range` is not NULL
+group by category;
+
+-- Задание 67
+select client_id, id
+from tickets as tick_main
+where price > 0.6 * (
+    select max(tick.price) from tickets as tick where tick.client_id = tick_main.client_id
+) order by client_id;
+
+-- Задание 68
+-- Единственный билет имеет цену null
+select (
+    select avg(price)
+    from tickets 
+    where trip_id='8RF8OIOVFR'
+) - (
+    select avg(price)
+    from tickets
+) as diff;
+
+-- Задание 69
+select (
+    select avg(price)
+    from tickets 
+    join trips as t on t.id=tickets.trip_id
+    where t.trip_code in ('FYIHSLAA', 'FYDKIBWN')
+) - (
+    select avg(price)
+    from tickets
+) as diff;
+
+-- Задание 70
+-- Дубль задания 42
+select side_number, case 
+    when production_year < 2000 then 'Old'
+    when production_year between 2000 and 2010 then 'Mid'
+    else 'New'
+    end as age
+from airliners where `range` <= 10000
+order by 
+    age asc;
