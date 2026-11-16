@@ -1,11 +1,4 @@
 delimiter $$
-create procedure get_all_trips (in search_client_id varchar(12))
-BEGIN
-    select * from tickets where client_id=search_client_id;
-END $$
-delimiter ;
-
-delimiter $$
 create FUNCTION get_count_client_trips (search_client_id varchar(12))
 RETURNS INT 
 not deterministic 
