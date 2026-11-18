@@ -392,3 +392,21 @@ select side_number, case
 from airliners where `range` <= 10000
 order by 
     age asc;
+
+
+-- Доп задания
+-- Вывести клиентов чей рейс был отменён
+select clients.id, clients.name, clients.phone, tr.id as trip_id
+from clients
+join tickets as tick on tick.client_id = clients.id
+join trips as tr on tr.id = tick.trip_id 
+where tr.status = 'Cancelled';
+
+-- Посчитать среднюю цену блилета для каждого service_class
+select service_class, AVG(price) from tickets
+group by service_class;
+
+-- Количество вылетов каждого самолета
+select airliner_id, count(*) from trips
+where status in ('Arrived', 'Departed')
+group by airliner_id;

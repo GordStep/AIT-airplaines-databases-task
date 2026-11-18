@@ -34,6 +34,32 @@ delimiter ;
 select id, get_client_miles(name) as total_miles from clients;
 
 -- Задание 3
+drop TABLE IF EXISTS del_clients;
+drop trigger if exists delayed_clients_notification;
 
+CREATE TABLE del_clients (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255),
+    phone VARCHAR(255),
+    trip_code VARCHAR(8),
+    departure VARCHAR(3),
+    arrival VARCHAR(3)
+);
+
+delimiter $$
+create trigger delayed_clients_notification 
+AFTER UPDATE
+on trips
+for each row
+BEGIN
+    if new.status = 'Delayed' and old.status != 'Delayed' then
+        insert into del_clients (name, phone, trip_code, departure, arrival)
+        select c.name, c.phone, new.trip_code, new.departure, new.arrival 
+        from tickets 
+        join clients as c on c.id = tickets.client_id
+        where tickets.trip_id = new.id;
+    end if;
+END $$
+delimiter ;
 
 -- Задание 4
