@@ -51,7 +51,7 @@ ALTER TABLE trips
     FOREIGN KEY (airliner_id) REFERENCES airliners(id);
 
 
-LOAD DATA LOCAL INFILE '/Users/gordstep/Documents/database/airplaines/csv/clients.csv'
+LOAD DATA LOCAL INFILE 'csv/clients.csv'
 INTO TABLE clients
 FIELDS TERMINATED BY ';'
 ENCLOSED BY '"'
@@ -63,21 +63,21 @@ update clients set phone = NULL where phone = 'null';
 select phone, replace(phone, ' ', '')  from clients;
 update clients set phone = concat('+', phone) where left(phone, 1) != '+';
 
-LOAD DATA LOCAL INFILE '/Users/gordstep/Documents/database/airplaines/csv/airliners.csv'
+LOAD DATA LOCAL INFILE 'csv/airliners.csv'
 INTO TABLE airliners
 FIELDS TERMINATED BY ';'
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA LOCAL INFILE '/Users/gordstep/Documents/database/airplaines/csv/trips.csv'
+LOAD DATA LOCAL INFILE 'csv/trips.csv'
 INTO TABLE trips
 FIELDS TERMINATED BY ';'
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA LOCAL INFILE '/Users/gordstep/Documents/database/airplaines/csv/tickets.csv'
+LOAD DATA LOCAL INFILE 'csv/tickets.csv'
 INTO TABLE tickets
 FIELDS TERMINATED BY ';'
 ENCLOSED BY '"'
