@@ -63,3 +63,29 @@ END $$
 delimiter ;
 
 -- Задание 4
+drop procedure if exists add_ticket;
+
+delimiter $$
+create procedure add_ticket (
+    in t_id VARCHAR(12),
+    in t_trip_id VARCHAR(10),
+    in t_service_class VARCHAR(255),
+    in t_price INT,
+    in t_client_id VARCHAR(12)
+)
+BEGIN
+    declare trip_status varchar(255) DEFAULT "";
+
+    start transaction;
+    select status into trip_status from trips where id = t_trip_id;
+
+    if t_price is null or trip_status = 'Cancelled' then
+        rollback;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'оплата не прошла или рейс отменен';
+    else
+        insert into tickets (id, trip_id, service_class, price, client_id) values (t_id, t_trip_id, t_service_class, t_price, t_client_id);
+        commit;
+    end if;
+
+end $$
+delimiter ;
